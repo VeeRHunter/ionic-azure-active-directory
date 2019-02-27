@@ -1,0 +1,119 @@
+<ion-header class="header-class">
+  <ion-toolbar color="success" mode="ios">
+    <ion-buttons mode="ios" slot="secondary">
+      <ion-button>
+        <ion-icon slot="icon-only" size="default" name="md-menu"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title size="large">
+      My Profile
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding color="gray">
+  <ion-row class="image-data">
+    <img [src]="userData.profileImage" />
+  </ion-row>
+
+  <ion-row class="user-detail">
+    <ion-row class="user-title">
+      <span class="personal-info">
+        Personal Information
+      </span>
+    </ion-row>
+
+    <ion-row class="user-data">
+      <ion-row>
+        <span class="title-span">
+          First Name
+        </span>
+      </ion-row>
+      <ion-row>
+        <span class="detail-span">
+          {{userData.firstName}}
+        </span>
+      </ion-row>
+    </ion-row>
+
+    <ion-row class="user-data">
+      <ion-row>
+        <span class="title-span">
+          Last Name
+        </span>
+      </ion-row>
+      <ion-row>
+        <span class="detail-span">
+          {{userData.lastName}}
+        </span>
+      </ion-row>
+    </ion-row>
+
+    <ion-row class="user-data">
+      <ion-row>
+        <span class="title-span">
+          Email
+        </span>
+      </ion-row>
+      <ion-row>
+        <span class="detail-span">
+          {{userData.email}}
+        </span>
+      </ion-row>
+    </ion-row>
+
+    <ion-row class="user-data">
+      <ion-row>
+        <span class="title-span">
+          Job Title
+        </span>
+      </ion-row>
+      <ion-row>
+        <span class="detail-span">
+          {{userData.jobTitle}}
+        </span>
+      </ion-row>
+    </ion-row>
+
+    <ion-row class="user-data">
+      <ion-row>
+        <span class="title-span">
+          City
+        </span>
+      </ion-row>
+      <ion-row>
+        <span class="detail-span">
+          {{userData.city}}
+        </span>
+      </ion-row>
+    </ion-row>
+
+    <ion-row class="user-data">
+      <ion-row>
+        <span class="title-span">
+          Manage
+        </span>
+      </ion-row>
+      <ion-row>
+        <span class="detail-span">
+          {{userData.Manager}}
+        </span>
+      </ion-row>
+    </ion-row>
+
+    <ion-row class="user-data">
+      <ion-row>
+        <span class="title-span">
+          Department
+        </span>
+      </ion-row>
+      <ion-row>
+        <span class="detail-span">
+          {{userData.Department}}
+        </span>
+      </ion-row>
+    </ion-row>
+
+  </ion-row>
+
+</ion-content>

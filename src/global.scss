@@ -1,0 +1,77 @@
+// http://ionicframework.com/docs/theming/
+@import '~@ionic/angular/css/core.css';
+@import '~@ionic/angular/css/normalize.css';
+@import '~@ionic/angular/css/structure.css';
+@import '~@ionic/angular/css/typography.css';
+@import '~@ionic/angular/css/padding.css';
+@import '~@ionic/angular/css/float-elements.css';
+@import '~@ionic/angular/css/text-alignment.css';
+@import '~@ionic/angular/css/text-transformation.css';
+@import '~@ionic/angular/css/flex-utils.css';
+ion-row {
+    width: 100%;
+}
+
+.full-height {
+    height: 100%;
+    ion-button {
+        margin: auto;
+    }
+}
+
+.image-data {
+    img {
+        width: 150px;
+        height: 150px;
+        margin: auto;
+        border-radius: 30px;
+    }
+}
+
+.user-data {
+    width: 96%;
+    margin: auto;
+    border-bottom: 1px solid #e4e4e4;
+    .title-span {
+        color: #7fbd06;
+        font-size: 23px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+    .detail-span {
+        color: #989898;
+        width: 100%;
+        text-align: left;
+        font-size: 17px;
+    }
+}
+
+.header-class {
+    ion-toolbar {
+        background-color: green !important;
+    }
+    ion-icon {
+        color: white;
+    }
+}
+
+.user-detail {
+    width: 95%;
+    margin: auto;
+    margin-top: 30px;
+    padding-bottom: 5px;
+    border-radius: 20px;
+    background-color: white;
+    .user-title {
+        background-color: #003c7b;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        .personal-info {
+            font-size: 25px;
+            color: white;
+            text-align: center;
+            margin: auto;
+            padding: 10px 10px;
+        }
+    }
+}

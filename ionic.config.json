@@ -1,0 +1,7 @@
+{
+  "name": "active-login",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}

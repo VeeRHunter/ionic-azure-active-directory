@@ -4,12 +4,14 @@ import { MSAdal, AuthenticationContext, AuthenticationResult } from '@ionic-nati
 
 
 import { Http, Headers, ResponseContentType } from '@angular/http';
-import { DomSanitizer } from '@angular/platform-browser';
 import { LoadingService } from '../loading.service';
 import { ToastService } from '../toast.service';
 import { AuthService } from '../auth.service';
 import { NavController, Platform } from '@ionic/angular';
-import { MsAdalAngular6Service } from 'microsoft-adal-angular6';
+
+
+import * as Msal from 'msal';
+import { MsalAuthService } from '../msal-auth.service';
 
 
 @Component({
@@ -57,6 +59,19 @@ export class LoginPage implements OnInit {
     'apiState': 'activeLogin'
   }
 
+
+  public title: string = 'Home';
+
+  public hasLoggedIn: boolean = false;
+  public hasFetchedToken: boolean = false;
+  public hasFetchedUserInfo: boolean = false;
+  public hasFetchedApi: boolean = false;
+
+  public user: Msal.User;
+  public token: string;
+  public userInformation: any;
+  public api: any;
+
   constructor(
     private msAdal: MSAdal,
     private http: Http,
@@ -65,25 +80,26 @@ export class LoginPage implements OnInit {
     private auth: AuthService,
     private navCtrl: NavController,
     private platform: Platform,
-    private webASAD: MsAdalAngular6Service,
+    private authService: MsalAuthService,
   ) {
   }
 
   ngOnInit() {
-    if (!this.platform.is("mobile")) {
-      if (this.webASAD.userInfo != null) {
-        // this.webASAD.logout();
-      }
-    }
-    if (localStorage.getItem('newLogin') == 'start') {
-      localStorage.setItem('newLogin', '');
-      console.log(this.webASAD.userInfo);
-      var token = this.webASAD.acquireToken('b2623207-50a6-4b64-af52-2af7e4b4b5df').subscribe((token: string) => {
-        console.log('saved Login');
-        console.log(token);
-        this.tokenData = token;
-      });
-    }
+    // if (!this.platform.is("mobile")) {
+    //   if (this.webASAD.userInfo != null) {
+    //     // this.webASAD.logout();
+    //   }
+    // }
+    // if (localStorage.getItem('newLogin') == 'start') {
+    //   localStorage.setItem('newLogin', '');
+    //   console.log(this.webASAD.userInfo);
+    //   var token = this.webASAD.acquireToken('b2623207-50a6-4b64-af52-2af7e4b4b5df').subscribe((token: string) => {
+    //     console.log('saved Login');
+    //     console.log(token);
+    //     this.tokenData = token;
+    //   });
+    // }
+    // this.authService.logout(); 
   }
 
   loginActive() {
@@ -161,23 +177,13 @@ export class LoginPage implements OnInit {
           this.loading.dismiss();
         });
     } else {
-
-      console.log(this.webASAD.userInfo);
-
-      if (this.webASAD.userInfo == null) {
-        this.webASAD.login();
-        console.log('New Login');
-        localStorage.setItem('newLogin', 'start');
-      } else {
-        console.log('Old Login');
-        var token = this.webASAD.acquireToken('b2623207-50a6-4b64-af52-2af7e4b4b5df').subscribe((token: string) => {
-          console.log('Old Login');
-          console.log(token);
-          this.tokenData = token;
-        });
-        // this.tokenData = this.webASAD.RenewToken('2ef88888-99c5-4e91-89db-4cabe6ae661d');
-        // console.log(this.webASAD.RenewToken('2ef88888-99c5-4e91-89db-4cabe6ae661d'));
-      }
+      console.log("Browser");
+      // this.authService.login().then(result => {
+      //   console.log(result);
+      // }, error => {
+      //   console.log(error);
+      // })
+      this.login();
     }
   }
 
@@ -249,7 +255,11 @@ export class LoginPage implements OnInit {
       } else {
         this.loginData.Manager = '';
       }
-      this.loginData.userId = this.fullData.objectId;
+      if (this.platform.is("mobile")) {
+        this.loginData.userId = this.fullData.objectId;
+      } else {
+        this.loginData.userId = Object(this.user.idToken).oid;
+      }
       this.loginData.street = this.fullData.streetAddress;
       this.loginData.state = this.fullData.state;
       this.loginData.region = this.fullData.country;
@@ -262,6 +272,7 @@ export class LoginPage implements OnInit {
       this.loginData.Email = this.fullData.physicalDeliveryOfficeName;
       this.loginData.alternatePhone = this.fullData.physicalDeliveryOfficeName;
       this.loginData.alternateEmail = this.fullData.physicalDeliveryOfficeName;
+      console.log(this.loginData);
 
       this.auth.postData(this.loginData).then(result => {
         console.log(result);
@@ -277,6 +288,130 @@ export class LoginPage implements OnInit {
         this.callServer();
       }, 500);
     }
+  }
+
+
+
+  login() {
+    // LOG
+    console.log('LOGIN');
+
+    this.loading.present();
+
+    this.hasLoggedIn = false;
+
+    this.authService.login().then((user) => {
+      // LOG
+      console.log('USER');
+      console.log(user);
+      this.fetchToken();
+
+      if (user) {
+        this.user = user;
+
+        this.hasLoggedIn = true;
+      } else {
+        this.loading.dismiss();
+      }
+    }, (error) => {
+      // LOG
+      console.error('LOGIN ERROR');
+      console.error(error);
+      this.loading.dismiss();
+
+      this.user = null;
+    });
+  }
+
+  fetchToken() {
+    // LOG
+    console.log('FETCH TOKEN');
+
+    this.hasFetchedToken = false;
+
+    this.authService.fetchToken().then((tokenData) => {
+      // LOG
+      console.log('FETCH TOKEN SUCCESS');
+
+      this.token = tokenData;
+
+      const httpheader = new Headers();
+      httpheader.append('Authorization', 'Bearer ' + this.token);
+      httpheader.append('Content-Type', 'application/json');
+
+      this.http.get('https://graph.microsoft.com/beta/me', { headers: httpheader }).toPromise().then((result: any) => {
+
+        this.fullData = JSON.parse(result._body);
+        this.fullDataState = true;
+      }, (error: any) => {
+        this.fullDataState = true;
+      });
+
+      this.http.get('https://graph.microsoft.com/beta/me/photo/$value',
+        { headers: httpheader, responseType: ResponseContentType.Blob }).toPromise()
+        .then((res: any) => {
+
+          this.photoState = true;
+          let blob = new Blob([res._body], {
+            type: res.headers.get("Content-Type")
+          });
+
+          var reader = new FileReader();
+          reader.readAsDataURL(blob);
+          reader.onloadend = () => {
+            this.imageBase64 = reader.result;
+          }
+        });
+
+      this.http.get('https://graph.microsoft.com/beta/me/manager', { headers: httpheader }).toPromise().then((result: any) => {
+        console.log(result);
+        // console.log(JSON.parse(result._body));
+        this.managerData = JSON.parse(result._body);
+        this.managerState = true;
+      }, (error: any) => {
+        console.log(error);
+        this.managerState = true;
+      });
+
+      this.callServer();
+
+      this.hasFetchedToken = true;
+    }, (error) => {
+      // LOG
+      console.error('FETCH TOKEN ERROR');
+      console.error(error);
+      this.loading.dismiss();
+
+      this.token = '';
+    });
+  }
+
+  fetchUserInfo() {
+    // LOG
+    console.log('FETCH USER INFO');
+
+    this.hasFetchedUserInfo = false;
+
+    // this.graphService.fetch(this.token).subscribe((data) => {
+    //   // LOG
+    //   console.log('FETCH USER INFO SUCCESS');
+    //   console.log(data);
+
+    //   this.userInformation = data;
+
+    //   this.hasFetchedUserInfo = true;
+    // }, (error) => {
+    //   // LOG
+    //   console.error('FETCH USER INFO ERROR');
+    //   console.error(error);
+
+    //   this.userInformation = '';
+    // });
+  }
+
+  logout() {
+    this.authService.logout();
+    // this.webASAD.logout();
   }
 
 }

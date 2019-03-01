@@ -85,21 +85,6 @@ export class LoginPage implements OnInit {
   }
 
   ngOnInit() {
-    // if (!this.platform.is("mobile")) {
-    //   if (this.webASAD.userInfo != null) {
-    //     // this.webASAD.logout();
-    //   }
-    // }
-    // if (localStorage.getItem('newLogin') == 'start') {
-    //   localStorage.setItem('newLogin', '');
-    //   console.log(this.webASAD.userInfo);
-    //   var token = this.webASAD.acquireToken('b2623207-50a6-4b64-af52-2af7e4b4b5df').subscribe((token: string) => {
-    //     console.log('saved Login');
-    //     console.log(token);
-    //     this.tokenData = token;
-    //   });
-    // }
-    // this.authService.logout(); 
   }
 
   loginActive() {
@@ -108,19 +93,11 @@ export class LoginPage implements OnInit {
     this.photoState = false;
     this.managerState = false;
 
-    // this.auth.login();
-
-    // https://dev-ut6spngh.auth0.com/api/v2/
-
     if (this.platform.is("mobile")) {
+      this.loading.present();
 
       let authContext: AuthenticationContext = this.msAdal.createAuthenticationContext('https://login.windows.net/common');
 
-
-      this.loading.present();
-
-      // b2623207-50a6-4b64-af52-2af7e4b4b5df  impact_it@outlook.com
-      // https://outlook.office365.com/
       authContext.acquireTokenAsync('https://graph.windows.net', 'b2623207-50a6-4b64-af52-2af7e4b4b5df', 'http://localhost/home', "", "")
         .then((authResponse: AuthenticationResult) => {
           console.log(authResponse);
@@ -178,58 +155,8 @@ export class LoginPage implements OnInit {
         });
     } else {
       console.log("Browser");
-      // this.authService.login().then(result => {
-      //   console.log(result);
-      // }, error => {
-      //   console.log(error);
-      // })
       this.login();
     }
-  }
-
-  getUserData() {
-    const httpheader = new Headers();
-    httpheader.append('Authorization', this.tokenData);
-    httpheader.append('Content-Type', 'application/json');
-
-
-    this.http.get('https://graph.windows.net/me?api-version=1.6', { headers: httpheader }).toPromise()
-      .then((result: any) => {
-        console.log(JSON.parse(result._body));
-        this.fullData = JSON.parse(result._body);
-        this.fullDataState = true;
-      }, error => {
-        console.error(error);
-        this.fullDataState = true;
-      });
-
-
-    this.http.get('https://graph.windows.net/me/manager?api-version=1.6', { headers: httpheader }).toPromise()
-      .then((result: any) => {
-        console.log(JSON.parse(result._body));
-        this.managerData = JSON.parse(result._body);
-        this.managerState = true;
-      }, error => {
-        console.error(error);
-        this.managerState = true;
-      });
-
-    this.http.get('https://graph.windows.net/me/thumbnailPhoto?api-version=1.6',
-      { headers: httpheader, responseType: ResponseContentType.Blob }).toPromise()
-      .then((res: any) => {
-        this.photoState = true;
-        let blob = new Blob([res._body], {
-          type: res.headers.get("Content-Type")
-        });
-
-        var reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onloadend = () => {
-          this.imageBase64 = reader.result;
-        }
-      });
-
-    this.callServer();
   }
 
   callServer() {

@@ -13,6 +13,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { HttpModule } from '@angular/http';
 import { LoadingService } from '../loading.service';
 import { ToastService } from '../toast.service';
+import { MsalAuthService } from '../msal-auth.service';
 
 
 const routes: Routes = [
@@ -36,6 +37,7 @@ const routes: Routes = [
     MSAdal,
     LoadingService,
     ToastService,
+    MsalAuthService,
   ]
 })
 export class LoginPageModule { }

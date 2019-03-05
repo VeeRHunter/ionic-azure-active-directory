@@ -93,7 +93,7 @@ export class LoginPage implements OnInit {
     this.photoState = false;
     this.managerState = false;
 
-    if (this.platform.is("mobile")) {
+    if (this.platform.is("android") || this.platform.is("ios") || this.platform.is("mobile")) {
       this.loading.present();
 
       let authContext: AuthenticationContext = this.msAdal.createAuthenticationContext('https://login.windows.net/common');
@@ -182,7 +182,7 @@ export class LoginPage implements OnInit {
       } else {
         this.loginData.Manager = '';
       }
-      if (this.platform.is("mobile")) {
+      if (this.platform.is("android") || this.platform.is("ios") || this.platform.is("mobile")) {
         this.loginData.userId = this.fullData.objectId;
       } else {
         this.loginData.userId = Object(this.user.idToken).oid;
